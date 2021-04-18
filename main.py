@@ -66,7 +66,7 @@ def main() -> None:
         }
     '''
     prog7 = '''
-        fun func(a: Int, b: Int, c: String) {
+        fun func() : Double{
             var res = a*b
             return 
         }

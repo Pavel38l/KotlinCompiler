@@ -135,7 +135,7 @@ def _make_parser():
                             if isinstance(tocs[-2], TypeNode):
                                 return FuncNode(tocs[-2], tocs[0], tocs[1:-2], tocs[-1], loc=loc)
                             else:
-                                return FuncNode(None, tocs[0], tocs[1:], tocs[-1], loc=loc)
+                                return FuncNode(None, tocs[0], tocs[1:-1], tocs[-1], loc=loc)
                         else:
                             return cls(*tocs, loc=loc)
                     parser.setParseAction(parse_action)
