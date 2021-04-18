@@ -81,13 +81,13 @@ def _make_parser():
 
     if_ = IF.suppress() + LPAR + expr + RPAR + stmt + pp.Optional(pp.Keyword("else").suppress() + stmt)
     for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
-    return_ = RETURN.suppress() + expr
+    return_ = RETURN.suppress() + pp.Optional(expr)
     composite = LBRACE + stmt_list + RBRACE
 
-    #param = type_ + ident
     param = ident + COLON.suppress() + type_
-    params = pp.Optional(param + pp.ZeroOrMore(COMMA + param))
-    func = FUN.suppress() + ident + LPAR + params + RPAR + pp.Optional(COLON + type_) + LBRACE + stmt_list + RBRACE
+    param_def = param + ASSIGN.suppress() + expr
+    params = pp.Optional(param + pp.ZeroOrMore(COMMA + param) + pp.ZeroOrMore(COMMA + param_def))
+    func = FUN.suppress() + ident + LPAR + params + RPAR + pp.Optional(COLON.suppress() + type_) + LBRACE + stmt_list + RBRACE
 
     stmt << (
             if_ |
@@ -131,7 +131,11 @@ def _make_parser():
                 if not inspect.isabstract(cls):
                     def parse_action(s, loc, tocs):
                         if cls is FuncNode:
-                            return FuncNode(tocs[0], tocs[1], tocs[2:-1], tocs[-1], loc=loc)
+                            print(tocs)
+                            if isinstance(tocs[-2], TypeNode):
+                                return FuncNode(tocs[-2], tocs[0], tocs[1:-2], tocs[-1], loc=loc)
+                            else:
+                                return FuncNode(None, tocs[0], tocs[1:], tocs[-1], loc=loc)
                         else:
                             return cls(*tocs, loc=loc)
                     parser.setParseAction(parse_action)

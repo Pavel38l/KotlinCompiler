@@ -65,8 +65,13 @@ def main() -> None:
             println("a равно 10");
         }
     '''
-
-    program.execute(prog6)
+    prog7 = '''
+        fun func(a: Int, b: Int, c: String) {
+            var res = a*b
+            return 
+        }
+    '''
+    program.execute(prog7)
 
 
 if __name__ == "__main__":

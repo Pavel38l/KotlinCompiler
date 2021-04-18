@@ -415,7 +415,7 @@ class ReturnNode(StmtNode):
     """Класс для представления в AST-дереве оператора return
     """
 
-    def __init__(self, val: ExprNode,
+    def __init__(self, val: ExprNode = None,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(row=row, col=col, **props)
         self.val = val
@@ -425,7 +425,7 @@ class ReturnNode(StmtNode):
 
     @property
     def childs(self) -> Tuple[ExprNode]:
-        return (self.val, )
+        return (self.val, ) if self.val is not None else ()
 
     def semantic_check(self, scope: IdentScope) -> None:
         self.val.semantic_check(IdentScope(scope))
@@ -499,17 +499,21 @@ class ParamNode(StmtNode):
     """Класс для представления в AST-дереве объявления параметра функции
     """
 
-    def __init__(self, type_: TypeNode, name: IdentNode,
+    def __init__(self, type_: TypeNode, name: IdentNode, value: ExprNode = None,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(row=row, col=col, **props)
         self.type = type_
         self.name = name
+        self.value = value
 
     def __str__(self) -> str:
         return str(self.type)
 
     @property
     def childs(self) -> Tuple[IdentNode]:
+        childs = [self.name]
+        if self.value is not None:
+            childs.append(self.value)
         return self.name,
 
     def semantic_check(self, scope: IdentScope) -> None:
@@ -521,7 +525,6 @@ class ParamNode(StmtNode):
             raise self.name.semantic_error('Параметр {} уже объявлен'.format(self.name.name))
         self.node_type = TypeDesc.VOID
 
-
 class FuncNode(StmtNode):
     """Класс для представления в AST-дереве объявления функции
     """
@@ -529,7 +532,7 @@ class FuncNode(StmtNode):
     def __init__(self, type_: TypeNode, name: IdentNode, params: Tuple[ParamNode], body: StmtNode,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(row=row, col=col, **props)
-        self.type = type_
+        self.type = type_ if type_ is not None else TypeNode('Void')
         self.name = name
         self.params = params
         self.body = body
