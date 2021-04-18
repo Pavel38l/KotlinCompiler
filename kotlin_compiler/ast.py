@@ -499,12 +499,12 @@ class ParamNode(StmtNode):
     """Класс для представления в AST-дереве объявления параметра функции
     """
 
-    def __init__(self, type_: TypeNode, name: IdentNode, value: ExprNode = None,
+    def __init__(self, name: IdentNode, type_: TypeNode, expr: ExprNode = None,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(row=row, col=col, **props)
         self.type = type_
         self.name = name
-        self.value = value
+        self.value = expr
 
     def __str__(self) -> str:
         return str(self.type)
@@ -514,7 +514,7 @@ class ParamNode(StmtNode):
         childs = [self.name]
         if self.value is not None:
             childs.append(self.value)
-        return self.name,
+        return childs
 
     def semantic_check(self, scope: IdentScope) -> None:
         self.type.semantic_check(scope)
@@ -524,6 +524,7 @@ class ParamNode(StmtNode):
         except SemanticException:
             raise self.name.semantic_error('Параметр {} уже объявлен'.format(self.name.name))
         self.node_type = TypeDesc.VOID
+
 
 class FuncNode(StmtNode):
     """Класс для представления в AST-дереве объявления функции

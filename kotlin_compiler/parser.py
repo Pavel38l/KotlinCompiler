@@ -85,8 +85,8 @@ def _make_parser():
     composite = LBRACE + stmt_list + RBRACE
 
     param = ident + COLON.suppress() + type_
-    param_def = param + ASSIGN.suppress() + expr
-    params = pp.Optional(param + pp.ZeroOrMore(COMMA + param) + pp.ZeroOrMore(COMMA + param_def))
+    #param_def = (ident + COLON.suppress() + type_ + ASSIGN.suppress() + expr).setName('param')
+    params = param + pp.ZeroOrMore(COMMA + param)
     func = FUN.suppress() + ident + LPAR + params + RPAR + pp.Optional(COLON.suppress() + type_) + LBRACE + stmt_list + RBRACE
 
     stmt << (
