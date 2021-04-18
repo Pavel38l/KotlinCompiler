@@ -373,6 +373,8 @@ class VarNode(StmtNode):
     def __init__(self, *params,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(row=row, col=col, **props)
+        self.declare = params[0]
+        params = params[1:]
         sep = params[1]
         self.ident = params[0]
         self.type = None
@@ -385,7 +387,7 @@ class VarNode(StmtNode):
             self.var = params[1]
 
     def __str__(self) -> str:
-        return 'var'
+        return self.declare
 
     @property
     def childs(self) -> Tuple[AstNode, ...]:

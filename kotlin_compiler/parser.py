@@ -11,8 +11,9 @@ def _make_parser():
     FOR = pp.Keyword('for')
     RETURN = pp.Keyword('return')
     VAR = pp.Keyword('var')
+    VAL = pp.Keyword('val')
     FUN = pp.Keyword('fun')
-    keywords = IF | FOR | RETURN | VAR | FUN
+    keywords = IF | FOR | RETURN | VAR | VAL | FUN
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
     num = pp.Regex('[+-]?\\d+\\.?\\d*([eE][+-]?\\d+)?')
@@ -67,7 +68,7 @@ def _make_parser():
     # var_inner = simple_assign | ident
     # vars_ = type_ + var_inner + pp.ZeroOrMore(COMMA + var_inner)
     simple_assign = (ident + ASSIGN.suppress() + expr).setName('assign')
-    var_ = VAR.suppress() + ((ident + COLON + type_ + pp.Optional(ASSIGN.suppress() + expr)) |
+    var_ = (VAR | VAL) + ((ident + COLON + type_ + pp.Optional(ASSIGN.suppress() + expr)) |
                              (ident + pp.Optional(ASSIGN.suppress() + expr)))
 
     assign = ident + ASSIGN.suppress() + expr

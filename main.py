@@ -60,7 +60,7 @@ def main() -> None:
     prog6 = '''
         var a : Int = 10
         var b : Int
-        var c = 10
+        val c = 10
         if(a == 10) {
             println("a равно 10");
         }
