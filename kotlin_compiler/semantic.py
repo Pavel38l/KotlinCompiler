@@ -2,6 +2,13 @@ from typing import Tuple, Any, Dict, Optional
 from enum import Enum
 
 
+class SinOp(Enum):
+    """Перечисление возможных одиночных операторов
+    """
+    NE = '!'
+
+    def __str__(self):
+        return self.value
 # по идее, должен быть описан в ast, но возникают проблемы с cross импортом модулей, с которыми пока лень разбираться
 class BinOp(Enum):
     """Перечисление возможных биранных операций
@@ -18,8 +25,8 @@ class BinOp(Enum):
     LE = '<='
     EQUALS = '=='
     NEQUALS = '!='
-    BIT_AND = '&'
-    BIT_OR = '|'
+    BIT_AND = 'and'
+    BIT_OR = 'or'
     LOGICAL_AND = '&&'
     LOGICAL_OR = '||'
 

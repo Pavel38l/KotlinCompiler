@@ -13,7 +13,9 @@ def _make_parser():
     VAR = pp.Keyword('var')
     VAL = pp.Keyword('val')
     FUN = pp.Keyword('fun')
-    keywords = IF | FOR | RETURN | VAR | VAL | FUN
+    BIT_AND = pp.Keyword('and')
+    BIT_OR = pp.Keyword('or')
+    keywords = IF | FOR | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
     num = pp.Regex('[+-]?\\d+\\.?\\d*([eE][+-]?\\d+)?')
@@ -34,10 +36,10 @@ def _make_parser():
     MUL, DIV, MOD = pp.Literal('*'), pp.Literal('/'), pp.Literal('%')
     AND = pp.Literal('&&')
     OR = pp.Literal('||')
-    BIT_AND = pp.Literal('&')
-    BIT_OR = pp.Literal('|')
     GE, LE, GT, LT = pp.Literal('>='), pp.Literal('<='), pp.Literal('>'), pp.Literal('<')
     NEQUALS, EQUALS = pp.Literal('!='), pp.Literal('==')
+
+    NE = pp.Literal('!').setName('sin_op')
 
     add = pp.Forward()
     expr = pp.Forward()
@@ -59,8 +61,8 @@ def _make_parser():
     add << pp.Group(mult + pp.ZeroOrMore((ADD | SUB) + mult)).setName('bin_op')
     compare1 = pp.Group(add + pp.Optional((GE | LE | GT | LT) + add)).setName('bin_op')  # GE и LE первыми, т.к. приоритетный выбор
     compare2 = pp.Group(compare1 + pp.Optional((EQUALS | NEQUALS) + compare1)).setName('bin_op')
-    logical_and = pp.Group(compare2 + pp.ZeroOrMore(AND + compare2)).setName('bin_op')
-    logical_or = pp.Group(logical_and + pp.ZeroOrMore(OR + logical_and)).setName('bin_op')
+    logical_and = pp.Group(compare2 + pp.ZeroOrMore(AND | BIT_AND + compare2)).setName('bin_op')
+    logical_or = pp.Group(logical_and + pp.ZeroOrMore(OR | BIT_OR + logical_and)).setName('bin_op')
 
     expr << (logical_or)
 

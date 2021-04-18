@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from contextlib import suppress
 from typing import Optional, Union, Tuple, Callable
 
-from .semantic import TYPE_CONVERTIBILITY, BIN_OP_TYPE_COMPATIBILITY, BinOp, \
+from .semantic import TYPE_CONVERTIBILITY, BIN_OP_TYPE_COMPATIBILITY, BinOp, SinOp, \
     TypeDesc, IdentDesc, ScopeType, IdentScope, SemanticException
 
 
@@ -156,6 +156,24 @@ class TypeNode(IdentNode):
     def semantic_check(self, scope: IdentScope) -> None:
         if self.type is None:
             self.semantic_error('Неизвестный тип {}'.format(self.name))
+
+
+class SinOpNode(ExprNode):
+    """Класс для представления в AST-дереве бинарных операций
+    """
+
+    def __init__(self, op: SinOp, arg: ExprNode,
+                 row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
+        super().__init__(row=row, col=col, **props)
+        self.op = op
+        self.arg = arg
+
+    def __str__(self) -> str:
+        return str(self.op.value)
+
+    @property
+    def childs(self) -> Tuple[ExprNode]:
+        return self.arg,
 
 
 class BinOpNode(ExprNode):

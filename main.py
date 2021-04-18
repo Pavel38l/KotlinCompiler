@@ -71,7 +71,12 @@ def main() -> None:
             return 
         }
     '''
-    program.execute(prog7)
+    prog8 = '''
+            val a = true
+            val b = a  // false
+            val c = b  // true
+        '''
+    program.execute(prog8)
 
 
 if __name__ == "__main__":
