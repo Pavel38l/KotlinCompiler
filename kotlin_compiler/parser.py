@@ -16,12 +16,14 @@ def _make_parser():
     BIT_AND = pp.Keyword('and')
     BIT_OR = pp.Keyword('or')
     keywords = IF | FOR | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR
+    SEMI, COMMA, COLON, DOTS = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':'), pp.Literal('..')
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
     num = pp.Regex('[+-]?\\d+\\.?\\d*([eE][+-]?\\d+)?')
     # c escape-последовательностями как-то неправильно работает
     str_ = pp.QuotedString('"', escChar='\\', unquoteResults=False, convertWhitespaceEscapes=False)
-    literal = num | str_ | pp.Regex('true|false')
+    bool_ = pp.Regex('true|false')
+    literal = num | str_ | bool_
     # только, чтобы показать, ~keywords здесь не нужен
     ident = (~keywords + ppc.identifier.copy()).setName('ident')
     type_ = ident.copy().setName('type')
@@ -29,7 +31,6 @@ def _make_parser():
     LPAR, RPAR = pp.Literal('(').suppress(), pp.Literal(')').suppress()
     LBRACK, RBRACK = pp.Literal("[").suppress(), pp.Literal("]").suppress()
     LBRACE, RBRACE = pp.Literal("{").suppress(), pp.Literal("}").suppress()
-    SEMI, COMMA, COLON = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':')
     ASSIGN = pp.Literal('=')
 
     ADD, SUB = pp.Literal('+'), pp.Literal('-')
@@ -59,7 +60,8 @@ def _make_parser():
     # также можно воспользоваться pp.operatorPrecedence (должно быть проще, но не проверял)
     mult = pp.Group(group + pp.ZeroOrMore((MUL | DIV | MOD) + group)).setName('bin_op')
     add << pp.Group(mult + pp.ZeroOrMore((ADD | SUB) + mult)).setName('bin_op')
-    compare1 = pp.Group(add + pp.Optional((GE | LE | GT | LT) + add)).setName('bin_op')  # GE и LE первыми, т.к. приоритетный выбор
+    seq = pp.Group(add + pp.Optional(DOTS + add)).setName('bin_op')
+    compare1 = pp.Group(seq + pp.Optional((GE | LE | GT | LT) + seq)).setName('bin_op')  # GE и LE первыми, т.к. приоритетный выбор
     compare2 = pp.Group(compare1 + pp.Optional((EQUALS | NEQUALS) + compare1)).setName('bin_op')
     logical_and = pp.Group(compare2 + pp.ZeroOrMore(AND | BIT_AND + compare2)).setName('bin_op')
     logical_or = pp.Group(logical_and + pp.ZeroOrMore(OR | BIT_OR + logical_and)).setName('bin_op')
@@ -133,7 +135,6 @@ def _make_parser():
                 if not inspect.isabstract(cls):
                     def parse_action(s, loc, tocs):
                         if cls is FuncNode:
-                            print(tocs)
                             if isinstance(tocs[-2], TypeNode):
                                 return FuncNode(tocs[-2], tocs[0], tocs[1:-2], tocs[-1], loc=loc)
                             else:

@@ -29,6 +29,7 @@ class BinOp(Enum):
     BIT_OR = 'or'
     LOGICAL_AND = '&&'
     LOGICAL_OR = '||'
+    DOTS = '..'
 
     def __str__(self):
         return self.value

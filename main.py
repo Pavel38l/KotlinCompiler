@@ -72,8 +72,7 @@ def main() -> None:
         }
     '''
     prog8 = '''
-            val a = true
-            val b = a  // false
+            val b = 1 .. 2  // false
             val c = b  // true
         '''
     program.execute(prog8)
