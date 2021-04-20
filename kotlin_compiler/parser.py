@@ -40,7 +40,9 @@ def _make_parser():
     ASSIGN = pp.Literal('=')
 
     ADD, SUB = pp.Literal('+'), pp.Literal('-')
+    SADD, SSUB = pp.Literal('+='), pp.Literal('-=')
     MUL, DIV, MOD = pp.Literal('*'), pp.Literal('/'), pp.Literal('%')
+    SMUL, SDIV, SMOD = pp.Literal('*='), pp.Literal('/='), pp.Literal('%=')
     AND = pp.Literal('&&')
     OR = pp.Literal('||')
     GE, LE, GT, LT = pp.Literal('>='), pp.Literal('<='), pp.Literal('>'), pp.Literal('<')
@@ -54,7 +56,6 @@ def _make_parser():
     stmt_list = pp.Forward()
 
     call = ident + LPAR + pp.Optional(expr + pp.ZeroOrMore(COMMA + expr)) + RPAR
-
     group = (
         literal |
         call |  # обязательно перед ident, т.к. приоритетный выбор (или использовать оператор ^ вместо | )
@@ -64,6 +65,7 @@ def _make_parser():
 
     # обязательно везде pp.Group, иначе приоритет операций не будет работать (см. реализцию set_parse_action_magic);
     # также можно воспользоваться pp.operatorPrecedence (должно быть проще, но не проверял)
+
     mult = pp.Group(group + pp.ZeroOrMore((MUL | DIV | MOD) + group)).setName('bin_op')
     add << pp.Group(mult + pp.ZeroOrMore((ADD | SUB) + mult)).setName('bin_op')
     seq = pp.Group(add + pp.Optional((DOTS | UNTIL | DOWNTO) + add + pp.Optional(STEP + expr))).setName('bin_op')
@@ -81,11 +83,12 @@ def _make_parser():
     assign = ident + ASSIGN.suppress() + expr
     simple_stmt = assign | call
 
-    for_stmt_list0 = (pp.Optional(simple_stmt + pp.ZeroOrMore(COMMA + simple_stmt))).setName('stmt_list')
-    for_stmt_list = var_ | for_stmt_list0
-    for_cond = expr | pp.Group(pp.empty).setName('stmt_list')
-    for_body = stmt | pp.Group(SEMI).setName('stmt_list')
+    # for_stmt_list0 = (pp.Optional(simple_stmt + pp.ZeroOrMore(COMMA + simple_stmt))).setName('stmt_list')
+    # for_stmt_list = var_ | for_stmt_list0
+    # for_cond = expr | pp.Group(pp.empty).setName('stmt_list')
+    # for_body = stmt | pp.Group(SEMI).setName('stmt_list')
 
+    self_operators = pp.Group(ident + pp.Optional((SADD | SSUB | SMUL | SDIV | SMOD) + expr)).setName('bin_op')
     if_ = IF.suppress() + LPAR + expr + RPAR + stmt + pp.Optional(pp.Keyword("else").suppress() + stmt)
     #for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
     for_ = FOR.suppress() + LPAR + ident + IN.suppress() + expr + RPAR + stmt
@@ -107,10 +110,11 @@ def _make_parser():
             return_ |
             simple_stmt + pp.Optional(SEMI) |
             # обязательно ниже if, for и т.п., иначе считает их за типы данных (сейчас уже не считает - см. грамматику)
-            # обязательно выше vars, иначе посчитает за два vars
+            #             # обязательно выше vars, иначе посчитает за два vars
             var_ + pp.Optional(SEMI) |
             composite |
-            func
+            func |
+            self_operators
     )
 
     stmt_list << (pp.ZeroOrMore(stmt + pp.ZeroOrMore(SEMI)))

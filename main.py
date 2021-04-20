@@ -66,12 +66,14 @@ def main() -> None:
             }
             var result = 1;
             for(d in 1 .. n){
-                result = d
+                result *= d + 1
             }
             println("Factorial of $n is equal $result")
         }
         '''
-
+    prog12 = '''
+            a += 1
+            '''
     program.execute(prog11)
 
 
