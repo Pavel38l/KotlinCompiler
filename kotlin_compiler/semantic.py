@@ -30,6 +30,8 @@ class BinOp(Enum):
     LOGICAL_AND = '&&'
     LOGICAL_OR = '||'
     DOTS = '..'
+    UNTIL = 'until'
+    DOWNTO = 'downTo'
 
     def __str__(self):
         return self.value

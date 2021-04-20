@@ -176,6 +176,27 @@ class SinOpNode(ExprNode):
         return self.arg,
 
 
+class SeqNode(ExprNode):
+    """Класс для представления в AST-дереве бинарных операций
+    """
+
+    def __init__(self, startArg: ExprNode, seqOp: str, endArg: ExprNode,
+                 stepArg: ExprNode = None,
+                 row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
+        super().__init__(row=row, col=col, **props)
+        self.startArg = startArg
+        self.seqOp = seqOp
+        self.endArg = endArg
+        self.stepArg = stepArg
+
+    def __str__(self) -> str:
+        return 'seq'
+
+    @property
+    def childs(self) -> Tuple[ExprNode, ExprNode]:
+        return [self.startArg, self.seqOp, self.endArg] + [self.stepArg] if self.stepArg is not None else []
+
+
 class BinOpNode(ExprNode):
     """Класс для представления в AST-дереве бинарных операций
     """

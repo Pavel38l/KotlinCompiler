@@ -73,7 +73,8 @@ def main() -> None:
     '''
     prog8 = '''
             val b = 1 .. 2  // false
-            val c = b  // true
+            val c = 1 until 3  // true
+            val d = 5 downTo 3  // true
         '''
     program.execute(prog8)
 
