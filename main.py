@@ -73,10 +73,17 @@ def main() -> None:
     '''
     prog8 = '''
             val b = 1 .. 2  // false
-            val c = 1 until 3  // true
+            val c = 1 until 3 step 1 // true
             val d = 5 downTo 3  // true
         '''
-    program.execute(prog8)
+
+    prog9 = '''
+                for (i in seq) {
+                    println(i);
+                    println(2*i);
+                }
+            '''
+    program.execute(prog9)
 
 
 if __name__ == "__main__":

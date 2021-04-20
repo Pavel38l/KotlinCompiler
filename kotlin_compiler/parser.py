@@ -15,8 +15,9 @@ def _make_parser():
     FUN = pp.Keyword('fun')
     BIT_AND = pp.Keyword('and')
     BIT_OR = pp.Keyword('or')
-    UNTIL, DOWNTO = pp.Keyword('until'), pp.Keyword('downTo')
-    keywords = IF | FOR | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO
+    UNTIL, DOWNTO, STEP = pp.Keyword('until'), pp.Keyword('downTo'), pp.Keyword('step').suppress()
+    IN = pp.Keyword('in')
+    keywords = IF | FOR | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
     SEMI, COMMA, COLON, DOTS = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':'), pp.Literal('..')
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
@@ -61,7 +62,7 @@ def _make_parser():
     # также можно воспользоваться pp.operatorPrecedence (должно быть проще, но не проверял)
     mult = pp.Group(group + pp.ZeroOrMore((MUL | DIV | MOD) + group)).setName('bin_op')
     add << pp.Group(mult + pp.ZeroOrMore((ADD | SUB) + mult)).setName('bin_op')
-    seq = pp.Group(add + pp.Optional((DOTS | UNTIL | DOWNTO) + add)).setName('bin_op')
+    seq = pp.Group(add + pp.Optional((DOTS | UNTIL | DOWNTO) + add + pp.Optional(STEP + expr))).setName('bin_op')
     compare1 = pp.Group(seq + pp.Optional((GE | LE | GT | LT) + seq)).setName('bin_op')  # GE и LE первыми, т.к. приоритетный выбор
     compare2 = pp.Group(compare1 + pp.Optional((EQUALS | NEQUALS) + compare1)).setName('bin_op')
     logical_and = pp.Group(compare2 + pp.ZeroOrMore(AND | BIT_AND + compare2)).setName('bin_op')
@@ -85,7 +86,8 @@ def _make_parser():
     for_body = stmt | pp.Group(SEMI).setName('stmt_list')
 
     if_ = IF.suppress() + LPAR + expr + RPAR + stmt + pp.Optional(pp.Keyword("else").suppress() + stmt)
-    for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
+    #for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
+    for_ = FOR.suppress() + LPAR + ident + IN.suppress() + expr + RPAR + stmt
     return_ = RETURN.suppress() + pp.Optional(expr)
     composite = LBRACE + stmt_list + RBRACE
 
