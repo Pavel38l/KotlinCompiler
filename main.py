@@ -82,6 +82,9 @@ def main() -> None:
                     println(i);
                     println(2*i);
                 }
+                while(true) {
+                    println("hello")
+                }
             '''
     program.execute(prog9)
 

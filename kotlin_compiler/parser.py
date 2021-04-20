@@ -9,6 +9,7 @@ from .ast import *
 def _make_parser():
     IF = pp.Keyword('if')
     FOR = pp.Keyword('for')
+    WHILE = pp.Keyword('while')
     RETURN = pp.Keyword('return')
     VAR = pp.Keyword('var')
     VAL = pp.Keyword('val')
@@ -17,7 +18,7 @@ def _make_parser():
     BIT_OR = pp.Keyword('or')
     UNTIL, DOWNTO, STEP = pp.Keyword('until'), pp.Keyword('downTo'), pp.Keyword('step').suppress()
     IN = pp.Keyword('in')
-    keywords = IF | FOR | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
+    keywords = IF | FOR | WHILE | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
     SEMI, COMMA, COLON, DOTS = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':'), pp.Literal('..')
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
@@ -70,9 +71,6 @@ def _make_parser():
 
     expr << (logical_or)
 
-    # simple_assign = (ident + ASSIGN.suppress() + expr).setName('assign')
-    # var_inner = simple_assign | ident
-    # vars_ = type_ + var_inner + pp.ZeroOrMore(COMMA + var_inner)
     simple_assign = (ident + ASSIGN.suppress() + expr).setName('assign')
     var_ = (VAR | VAL) + ((ident + COLON + type_ + pp.Optional(ASSIGN.suppress() + expr)) |
                              (ident + pp.Optional(ASSIGN.suppress() + expr)))
@@ -88,6 +86,7 @@ def _make_parser():
     if_ = IF.suppress() + LPAR + expr + RPAR + stmt + pp.Optional(pp.Keyword("else").suppress() + stmt)
     #for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
     for_ = FOR.suppress() + LPAR + ident + IN.suppress() + expr + RPAR + stmt
+    while_ = WHILE.suppress() + LPAR + expr + RPAR + stmt
     return_ = RETURN.suppress() + pp.Optional(expr)
     composite = LBRACE + stmt_list + RBRACE
 
@@ -99,6 +98,7 @@ def _make_parser():
     stmt << (
             if_ |
             for_ |
+            while_ |
             return_ |
             simple_stmt + pp.Optional(SEMI) |
             # обязательно ниже if, for и т.п., иначе считает их за типы данных (сейчас уже не считает - см. грамматику)
