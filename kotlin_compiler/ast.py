@@ -549,16 +549,23 @@ class WhileNode(StmtNode):
     def childs(self) -> Tuple[AstNode, ...]:
         return self.condition, self.body
 
-    def semantic_check(self, scope: IdentScope) -> None:
-        scope = IdentScope(scope)
-        self.init.semantic_check(scope)
-        if self.cond == EMPTY_STMT:
-            self.cond = LiteralNode('true')
-        self.cond.semantic_check(scope)
-        self.cond = type_convert(self.cond, TypeDesc.BOOL, None, 'условие')
-        self.step.semantic_check(scope)
-        self.body.semantic_check(IdentScope(scope))
-        self.node_type = TypeDesc.VOID
+class DoWhileNode(StmtNode):
+    """Класс для представления в AST-дереве цикла while
+    """
+
+    def __init__(self, body: StmtNode, condition: ExprNode,
+                 row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
+        super().__init__(row=row, col=col, **props)
+        self.condition = condition
+        self.body = body
+
+    def __str__(self) -> str:
+        return 'do while'
+
+    @property
+    def childs(self) -> Tuple[AstNode, ...]:
+        return self.condition, self.body
+
 
 
 class ParamNode(StmtNode):

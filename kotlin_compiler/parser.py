@@ -10,6 +10,7 @@ def _make_parser():
     IF = pp.Keyword('if')
     FOR = pp.Keyword('for')
     WHILE = pp.Keyword('while')
+    DO = pp.Keyword('do')
     RETURN = pp.Keyword('return')
     VAR = pp.Keyword('var')
     VAL = pp.Keyword('val')
@@ -18,7 +19,7 @@ def _make_parser():
     BIT_OR = pp.Keyword('or')
     UNTIL, DOWNTO, STEP = pp.Keyword('until'), pp.Keyword('downTo'), pp.Keyword('step').suppress()
     IN = pp.Keyword('in')
-    keywords = IF | FOR | WHILE | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
+    keywords = IF | FOR | WHILE | DO|  RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
     SEMI, COMMA, COLON, DOTS = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':'), pp.Literal('..')
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
@@ -87,6 +88,7 @@ def _make_parser():
     #for_ = FOR.suppress() + LPAR + for_stmt_list + SEMI + for_cond + SEMI + for_stmt_list + RPAR + for_body
     for_ = FOR.suppress() + LPAR + ident + IN.suppress() + expr + RPAR + stmt
     while_ = WHILE.suppress() + LPAR + expr + RPAR + stmt
+    do_while = DO.suppress() + stmt + WHILE.suppress() + LPAR + expr + RPAR
     return_ = RETURN.suppress() + pp.Optional(expr)
     composite = LBRACE + stmt_list + RBRACE
 
@@ -98,6 +100,7 @@ def _make_parser():
     stmt << (
             if_ |
             for_ |
+            do_while |
             while_ |
             return_ |
             simple_stmt + pp.Optional(SEMI) |
