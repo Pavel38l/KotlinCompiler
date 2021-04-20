@@ -143,15 +143,20 @@ class TypeNode(IdentNode):
        (при появлении составных типов данных должен быть расширен)
     """
 
-    def __init__(self, name: str,
+    def __init__(self, name: str, generic = None,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(name, row=row, col=col, **props)
+        self.generic = generic
         self.type = None
         with suppress(SemanticException):
             self.type = TypeDesc.from_str(name)
 
     def to_str_full(self):
         return self.to_str()
+
+    @property
+    def childs(self):
+        return (self.generic, ) if self.generic else []
 
     def semantic_check(self, scope: IdentScope) -> None:
         if self.type is None:

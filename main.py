@@ -87,9 +87,13 @@ def main() -> None:
                 }
                 do {
                     println(1)
+                    println(1)
                 } while(true)
             '''
-    program.execute(prog9)
+    prog10 = '''
+            val numbers: Array<Array<Int>> = arrayOf(1, 2, 3, 4, 5)
+    '''
+    program.execute(prog10)
 
 
 if __name__ == "__main__":

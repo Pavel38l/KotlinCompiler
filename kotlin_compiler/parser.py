@@ -19,7 +19,7 @@ def _make_parser():
     BIT_OR = pp.Keyword('or')
     UNTIL, DOWNTO, STEP = pp.Keyword('until'), pp.Keyword('downTo'), pp.Keyword('step').suppress()
     IN = pp.Keyword('in')
-    keywords = IF | FOR | WHILE | DO|  RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
+    keywords = IF | FOR | WHILE | DO | RETURN | VAR | VAL | FUN | BIT_AND | BIT_OR | UNTIL | DOWNTO | IN
     SEMI, COMMA, COLON, DOTS = pp.Literal(';').suppress(), pp.Literal(',').suppress(), pp.Literal(':'), pp.Literal('..')
 
     # num = ppc.fnumber.copy().setParseAction(lambda s, loc, tocs: tocs[0])
@@ -30,11 +30,13 @@ def _make_parser():
     literal = num | str_ | bool_
     # только, чтобы показать, ~keywords здесь не нужен
     ident = (~keywords + ppc.identifier.copy()).setName('ident')
-    type_ = ident.copy().setName('type')
+    type_ = pp.Forward()
 
     LPAR, RPAR = pp.Literal('(').suppress(), pp.Literal(')').suppress()
     LBRACK, RBRACK = pp.Literal("[").suppress(), pp.Literal("]").suppress()
     LBRACE, RBRACE = pp.Literal("{").suppress(), pp.Literal("}").suppress()
+    LANGLE, RANGLE = pp.Literal("<").suppress(), pp.Literal(">").suppress()
+    type_ << (ident.copy() + pp.Optional(LANGLE + type_ + RANGLE)).setName('type')
     ASSIGN = pp.Literal('=')
 
     ADD, SUB = pp.Literal('+'), pp.Literal('-')
