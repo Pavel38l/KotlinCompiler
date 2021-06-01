@@ -72,9 +72,9 @@ def main() -> None:
         }
         '''
     prog12 = '''
-            a += 1
+            val a = "CHECK";
             '''
-    program.execute(prog11)
+    program.execute(prog12)
 
 
 if __name__ == "__main__":

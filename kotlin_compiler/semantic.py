@@ -46,11 +46,13 @@ class BaseType(Enum):
     """Перечисление для базовых типов данных
     """
 
-    VOID = 'void'
-    INT = 'int'
-    FLOAT = 'float'
-    BOOL = 'bool'
-    STR = 'string'
+    VOID = 'Void'
+    INT = 'Int'
+    LONG = 'Long'
+    FLOAT = 'Float'
+    DOUBLE = 'Double'
+    BOOL = 'Boolean'
+    STR = 'String'
 
     def __str__(self):
         return self.value
@@ -234,7 +236,7 @@ class IdentScope:
 
 
 class SemanticException(Exception):
-    """Класс для исключений во время семантического анализаё
+    """Класс для исключений во время семантического анализа
     """
 
     def __init__(self, message, row: int = None, col: int = None, **kwargs: Any) -> None:
@@ -334,11 +336,9 @@ BIN_OP_TYPE_COMPATIBILITY = {
 
 
 BUILT_IN_OBJECTS = '''
-    string read() { }
-    void print(string p0) { }
-    void println(string p0) { }
-    int to_int(string p0) { }
-    int to_float(string p0) { }
+    fun readLine(): String { }
+    fun print(p0: String) { }
+    fun println(p0: String) { }
 '''
 
 

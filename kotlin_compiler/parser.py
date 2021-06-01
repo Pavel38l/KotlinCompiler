@@ -100,7 +100,7 @@ def _make_parser():
     param = ident + COLON.suppress() + type_
     #param_def = (ident + COLON.suppress() + type_ + ASSIGN.suppress() + expr).setName('param')
     params = param + pp.ZeroOrMore(COMMA + param)
-    func = FUN.suppress() + ident + LPAR + params + RPAR + pp.Optional(COLON.suppress() + type_) + LBRACE + stmt_list + RBRACE
+    func = FUN.suppress() + ident + LPAR + pp.Optional(params) + RPAR + pp.Optional(COLON.suppress() + type_) + LBRACE + stmt_list + RBRACE
 
     stmt << (
             if_ |

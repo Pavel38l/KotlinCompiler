@@ -143,7 +143,7 @@ class TypeNode(IdentNode):
        (при появлении составных типов данных должен быть расширен)
     """
 
-    def __init__(self, name: str, generic = None,
+    def __init__(self, name: str, generic=None,
                  row: Optional[int] = None, col: Optional[int] = None, **props) -> None:
         super().__init__(name, row=row, col=col, **props)
         self.generic = generic
@@ -338,6 +338,10 @@ def type_convert(expr: ExprNode, type_: TypeDesc, except_node: Optional[AstNode]
 
     if expr.node_type is None:
         except_node.semantic_error('Тип выражения не определен')
+    if type_ is None:
+        except_node.node_type = expr.node_type
+        except_node.type = TypeNode(except_node.node_type.base_type)
+        return expr
     if expr.node_type == type_:
         return expr
     if expr.node_type.is_simple and type_.is_simple and \
@@ -444,9 +448,12 @@ class VarNode(StmtNode):
         return childs
 
     def semantic_check(self, scope: IdentScope) -> None:
-        self.type.semantic_check(scope)
-        var = self.var
-        var_node: IdentNode = var.var if isinstance(var, AssignNode) else var
+        if self.type is not None:
+            self.type.semantic_check(scope)
+        self.var.semantic_check(scope)
+        var = self.ident
+        var_node: IdentNode = var if isinstance(var, AssignNode) else var
+        self.var = type_convert(self.var, self.type.type if self.type is not None else None, self, 'присваиваемое значение')
         try:
             scope.add_ident(IdentDesc(var_node.name, self.type.type))
         except SemanticException as e:
